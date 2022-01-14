@@ -1,8 +1,17 @@
-# This file defines the requirements for a productive project deployment.
-# It should not contain dependencies for tests, developer tools, etc. (see environment-dev.yml)
+name: false-labels
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9.*
+  - h5py=2.*
+  - ipykernel=6.* 
+  - numpy=1.*
+  - matplotlib=3.*
+  - opencv=4.*
+  - pillow=8.*
+  - pip=21.*
   - PyYAML=5.*
+  - python=3.8.*
+  - scikit-learn=1.*
+  - tensorflow=2.*
+  - tqdm=4.*
