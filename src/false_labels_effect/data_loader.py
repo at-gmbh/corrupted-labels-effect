@@ -31,7 +31,7 @@ class DataLoader(tf.keras.utils.Sequence):
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            X[i,] = np.load('data/' + ID + '.npy')
+            X[i,] = np.load('../data/Images_4c_Poly/Train_Test_npy/' + ID + '.npy')
 
             # Store class
             y[i] = self.labels[ID]
