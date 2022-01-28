@@ -1,12 +1,9 @@
-import logging
+import math
+import random
 import sys
-from pathlib import Path
-from typing import Any, Dict, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pkg_resources
-import yaml
 from PIL import Image
 from sklearn import preprocessing
 
@@ -102,7 +99,7 @@ def encode_labels(train_labels_dict: dict, test_labels_dict:dict):
 
     return encoded_dicts
 
-# TODO: delete?
+
 def reformat_labels(labels_dict):
     """
     Simplify a dictionary
@@ -142,7 +139,7 @@ def resize(image: Image, labels_dict: dict, new_size: tuple):
         The pillow image to be resized.
     labels_dict : dict
         The labels dictionary from the .npy labels file with type
-        dict[str => dict[str=> Any]].
+        dict[str => dict[str => Any]].
     new_size : tuple
         2-tuple, (width, height) of the new image size.
 
@@ -166,6 +163,60 @@ def resize(image: Image, labels_dict: dict, new_size: tuple):
     labels_ret["Scale"] = scale
 
     return img_res, labels_ret
+
+
+def make_false_labels(labels, false_labels_ratio, classes):
+    """
+    Randomly changes the label values in labels according to false_labels_ratio.
+    Parameters
+    ----------
+        labels : dict[ str => str ]
+            true labels
+        false_labels_ratio : float
+            Ratio of labels to make false between 0 and 1
+            Resulting number of labels will be rounded down (math.floor)
+    
+    Returns
+    -------
+        numpy array with wrong labels
+    Sample:
+        print(y_train)
+        >>> {'Train_00001': 0,
+        >>>  'Train_00002': 0,
+        >>>  'Train_00003': 2,
+        >>>  'Train_00004': 0,
+        >>>  'Train_00005': 2}
+        print(make_false_labels(y_train, 0.5))
+        >>> {'Train_00001': 0,
+        >>>  'Train_00002': 0,
+        >>>  'Train_00003': 2,
+        >>>  'Train_00004': 3,
+        >>>  'Train_00005': 4}
+    """
+    false_labels = labels
+    n_labels = len(labels)
+
+    # Generate the IDs that will have false label
+    false_labels_count = math.floor(n_labels * false_labels_ratio)
+    print("Number of false labels:", false_labels_count)
+    wrong_label_keys = random.sample(list(labels.keys()), false_labels_count)
+
+    # Manipulate label if index in wrong_label_ids
+    for key in wrong_label_keys:
+        # init wrong label
+        wrong_label = None
+
+        # get true value
+        true_value = labels[key]
+
+        # change label until label is wrong
+        while wrong_label == None or wrong_label == labels[key]:
+            wrong_label = random.randint(0, classes)
+
+        # set wrong label
+        false_labels[key] = wrong_label
+    
+    return false_labels
 
 
 def plot_sample(image: np.ndarray, labels: dict):
