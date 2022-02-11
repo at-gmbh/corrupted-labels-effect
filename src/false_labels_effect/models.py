@@ -3,7 +3,7 @@ from tensorflow.keras.applications import ResNet50
 
 
 # define model
-def create_model(img_shape, n_classes):
+def create_cnn_model(img_shape, n_classes):
     """
     Create a basic CNN
 
@@ -31,6 +31,8 @@ def create_model(img_shape, n_classes):
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(n_classes, activation='softmax'))
 
+    model._name="basic_cnn"
+
     print(model.summary())
 
     return model
@@ -42,6 +44,8 @@ def create_resnet_model(img_shape, n_classes):
 
     Parameters
     ----------
+    img_shape : tuple
+        shape of image
     n_classes : int
         number of classes
 
@@ -50,7 +54,7 @@ def create_resnet_model(img_shape, n_classes):
     model : keras.Sequential
         cnn resnet model
     """
-    resnet_model = ResNet50(include_top=False, weights="imagenet", input_tensor=img_shape)
+    resnet_model = ResNet50(include_top=False, weights="imagenet", input_shape=(img_shape[0], img_shape[1], 3))
 
     model = models.Sequential()
 
@@ -58,6 +62,8 @@ def create_resnet_model(img_shape, n_classes):
     model.add(layers.GlobalAveragePooling2D())
     model.add(layers.Dense(2048, activation="relu"))
     model.add(layers.Dense(n_classes, activation='softmax'))
+
+    model._name="resnet50_cnn"
 
     print(model.summary())
 

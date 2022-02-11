@@ -165,16 +165,58 @@ def resize(image: Image, labels_dict: dict, new_size: tuple):
     return img_res, labels_ret
 
 
+def train_val_split(x_train, y_train, val_split):
+    """
+    Randomly split train img / labels into train img/ labels and
+    validation img / labels
+
+    Parameters
+    ----------
+    x_train : list
+        list of img ids currently allocated for training and not testing
+    y_train : dict[str => int]
+
+    val_split : float
+        split ration for validation
+        0.2 => 20% of training data is removed from training used for validation
+        Resulting number of val imgs / labels will be rounded down (math.floor)
+
+    Returns
+    -------
+    x_train_splitted : list
+        filtered list of img ids for training
+    y_train_splitted : dict[str => int]
+        filtered dict of img ids and corresponding label for training
+    x_val : list
+        list of img ids for validation
+    y_val : dict[str => int]
+        dict of img ids and corresponding label for validation
+    """
+    # from train img randomly select img for validation
+    x_val = random.sample(list(x_train), math.floor(len(x_train) * val_split))
+    # remove val img from train img
+    x_train_splitted = [id for id in x_train if id not in x_val]
+
+    y_val = {}
+    y_train_splitted = y_train.copy()
+
+    for id in x_val:
+        y_val[id] = y_train[id]
+        y_train_splitted.pop(id)
+    
+    return x_train_splitted, y_train_splitted, x_val, y_val
+
 def make_false_labels(labels, false_labels_ratio, classes):
     """
     Randomly changes the label values in labels according to false_labels_ratio.
+
     Parameters
     ----------
-        labels : dict[ str => str ]
-            true labels
-        false_labels_ratio : float
-            Ratio of labels to make false between 0 and 1
-            Resulting number of labels will be rounded down (math.floor)
+    labels : dict[ str => str ]
+        true labels
+    false_labels_ratio : float
+        Ratio of labels to make false between 0 and 1
+        Resulting number of labels will be rounded down (math.floor)
     
     Returns
     -------
