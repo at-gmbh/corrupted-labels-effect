@@ -1,4 +1,5 @@
 import math
+import os
 import random
 import sys
 
@@ -206,17 +207,21 @@ def train_val_split(x_train, y_train, val_split):
     
     return x_train_splitted, y_train_splitted, x_val, y_val
 
-def make_false_labels(labels, false_labels_ratio, classes):
+def make_false_labels(label_path, labels, false_labels_ratio, classes):
     """
     Randomly changes the label values in labels according to false_labels_ratio.
 
     Parameters
     ----------
+    label_path : str
+        path to save or load existing false labels from
     labels : dict[ str => str ]
         true labels
     false_labels_ratio : float
         Ratio of labels to make false between 0 and 1
         Resulting number of labels will be rounded down (math.floor)
+    classes : int
+        number of classes in data set
     
     Returns
     -------
@@ -233,32 +238,46 @@ def make_false_labels(labels, false_labels_ratio, classes):
         >>>  'Train_00002': 0,
         >>>  'Train_00003': 2,
         >>>  'Train_00004': 3,
-        >>>  'Train_00005': 4}
+        >>>  'Train_00005': 0}
     """
-    false_labels = labels
-    n_labels = len(labels)
+    # check if false labels already exist for specified ratio
+    label_name = f'Train_{format(int(false_labels_ratio*10000),"04d")}.npy'
 
-    # Generate the IDs that will have false label
-    false_labels_count = math.floor(n_labels * false_labels_ratio)
-    print("Number of false labels:", false_labels_count)
-    wrong_label_keys = random.sample(list(labels.keys()), false_labels_count)
+    if not os.path.exists(f'{label_path}\{label_name}'):
+        false_labels = labels
+        n_labels = len(labels)
 
-    # Manipulate label if index in wrong_label_ids
-    for key in wrong_label_keys:
-        # init wrong label
-        wrong_label = None
+        # Generate the IDs that will have false label
+        false_labels_count = math.floor(n_labels * false_labels_ratio)
+        print("Number of false labels:", false_labels_count)
+        wrong_label_keys = random.sample(list(labels.keys()), false_labels_count)
 
-        # get true value
-        true_value = labels[key]
+        # Manipulate label if index in wrong_label_ids
+        for key in wrong_label_keys:
+            # init wrong label
+            wrong_label = None
 
-        # change label until label is wrong
-        while wrong_label == None or wrong_label == labels[key]:
-            wrong_label = random.randint(0, classes)
+            # get true value
+            true_value = labels[key]
 
-        # set wrong label
-        false_labels[key] = wrong_label
-    
-    return false_labels
+            # change label until label is wrong
+            while wrong_label == None or wrong_label == true_value:
+                wrong_label = random.randint(0, classes - 1)
+
+            # set wrong label
+            false_labels[key] = wrong_label
+        
+        np.save(f'{label_path}\{label_name}', false_labels)
+        return false_labels
+    # else load existing false labels
+    else:
+        false_labels = np.load(f'{label_path}\{label_name}',
+                               allow_pickle=True).item()
+        n_labels = len(false_labels)
+        false_labels_count = math.floor(n_labels * false_labels_ratio)
+        print("Number of false labels:", false_labels_count)
+
+        return false_labels
 
 
 def plot_sample(image: np.ndarray, labels: dict):
