@@ -3,7 +3,7 @@ from tensorflow.keras.applications import ResNet50
 
 
 # define model
-def create_cnn_model(img_shape, n_classes):
+def create_cnn_model(img_shape, n_classes, false_labels_ratio):
     """
     Create a basic CNN
 
@@ -31,14 +31,12 @@ def create_cnn_model(img_shape, n_classes):
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(n_classes, activation='softmax'))
 
-    model._name="basic_cnn"
-
-    print(model.summary())
+    model._name=f'basic_{format(int(false_labels_ratio*100),"04d")}'
 
     return model
 
 
-def create_resnet_model(img_shape, n_classes):
+def create_resnet_model(img_shape, n_classes, false_labels_ratio):
     """
     Create a CNN based on ResNet50
 
@@ -63,8 +61,6 @@ def create_resnet_model(img_shape, n_classes):
     model.add(layers.Dense(2048, activation="relu"))
     model.add(layers.Dense(n_classes, activation='softmax'))
 
-    model._name="resnet50_cnn"
-
-    print(model.summary())
+    model._name=f'resnet_{format(int(false_labels_ratio*100),"04d")}'
 
     return model
