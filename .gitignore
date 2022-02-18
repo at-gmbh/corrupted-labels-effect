@@ -41,7 +41,6 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-logs/scalars/
 
 # Flask stuff:
 instance/
@@ -55,6 +54,12 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# logs
+logs/scalars/
+
+# models
+logs/models/
 
 # virtualenv
 .env

@@ -47,6 +47,12 @@ Assuming you already have Jupyter installed, you can make your virtual environme
 
 Note that we mainly use notebooks for experiments, visualizations and reports. Every piece of functionality that is meant to be reused should go into module code and be imported into notebooks.
 
+To view Tensorboard with logged metrics, open terminal, activate created env and from project root directory start Tensorboard via
+    
+    tensorboard --logdir ./logs/scalars
+
+Then open http://localhost:6006/ in your prefered browser.
+
 ### Distribution Package
 
 To build a distribution package (wheel), please use
