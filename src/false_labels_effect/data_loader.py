@@ -6,7 +6,7 @@ import tensorflow as tf
 class DataLoader(tf.keras.utils.Sequence):
     'Data loader for Keras'
     def __init__(self, list_IDs, labels, batch_size=32, dim=(32,32,32), n_channels=1,
-                n_classes=10, shuffle=True):
+                 n_classes=4, shuffle=True):
         'Initialization'
         self.dim = dim
         self.batch_size = batch_size
@@ -15,7 +15,11 @@ class DataLoader(tf.keras.utils.Sequence):
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
+        self.y_true_dict = {}
         self.on_epoch_end()
+
+    def on_epoch_begin(self):
+        self.y_true_dict = {}
 
     def on_epoch_end(self):
         'Updates indexes after each epoch'
@@ -38,6 +42,9 @@ class DataLoader(tf.keras.utils.Sequence):
 
             # Store class
             y[i] = self.labels[ID]
+
+            # Store processed IDs and class for classification report
+            self.y_true_dict[ID] = self.labels[ID]
 
         return X, tf.keras.utils.to_categorical(y, num_classes=self.n_classes)
 
