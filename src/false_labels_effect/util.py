@@ -278,7 +278,7 @@ def make_false_labels(label_path, labels, fals_label_ratios, classes):
                                                 classes)
 
         # save np array
-        np.save(f'{label_path}\{label_name}', updated_labels)
+        np.save(f'{label_path}/{label_name}', updated_labels)
 
     return
 
@@ -349,7 +349,7 @@ def load_false_labels(label_path, false_labels_ratio):
         array of train labels including falsified labels
     """
     label_name = f'Train_{format(int(false_labels_ratio*10000),"05d")}r.npy'
-    false_labels = np.load(f'{label_path}\{label_name}',
+    false_labels = np.load(f'{label_path}/{label_name}',
                             allow_pickle=True).item()
     n_labels = len(false_labels)
     false_labels_count = math.floor(n_labels * false_labels_ratio)

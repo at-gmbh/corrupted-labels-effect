@@ -146,8 +146,8 @@ channel_name_arr = np.array(channel_display_list[:3])
 
 # Path to the PacalVoc Datasets
 # TODO: Replace with the directory where the images you want to distort are stored
-hdf5_train_path = ".\\data\\dataset_pascal_voc_07+12_trainval.h5"
-hdf5_test_path = ".\\data\\dataset_pascal_voc_07_test.h5"
+hdf5_train_path = "./data/dataset_pascal_voc_07+12_trainval.h5"
+hdf5_test_path = "./data/dataset_pascal_voc_07_test.h5"
 
 # Target paths
 if generate_polys == True:

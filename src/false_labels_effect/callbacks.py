@@ -1,4 +1,5 @@
 import json
+import os
 
 import tensorflow as tf
 from sklearn.metrics import classification_report
@@ -19,8 +20,9 @@ class class_report_cb(Callback):
     class_report : dict
         dictionary of classification report
     """
-    def __init__(self, dataloader):
+    def __init__(self, dataloader, model_start_time):
         self.dataloader = dataloader
+        self.model_start_time = model_start_time
     
     def on_epoch_begin(self, epoch, logs=None):
         self.dataloader.y_true_dict = {}
@@ -34,7 +36,11 @@ class class_report_cb(Callback):
 
         class_report = classification_report(y_true, y_pred, zero_division=0, output_dict=True)
 
-        with open('../logs/classification_report.json', 'w') as f:
+        # initialize logging
+        logdir_class_report = f'../logs/class_report/{self.model._name}/{self.model_start_time}'
+
+        os.makedirs(logdir_class_report)
+        with open(logdir_class_report + f'/class_report_{epoch}epoch.json', 'w+') as f:
             json.dump(class_report, f)
 
         for i in range(self.dataloader.n_classes):
