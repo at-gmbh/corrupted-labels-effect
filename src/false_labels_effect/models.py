@@ -31,7 +31,7 @@ def create_cnn_model(img_shape, n_classes, false_labels_ratio):
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(n_classes, activation='softmax'))
 
-    model._name=f'basic_{format(int(false_labels_ratio*100),"06d")}r_{n_classes}c'
+    model._name=f'basic_{format(int(false_labels_ratio*10000),"05d")}r_{n_classes}c'
 
     return model
 
@@ -61,6 +61,6 @@ def create_resnet_model(img_shape, n_classes, false_labels_ratio):
     model.add(layers.Dense(2048, activation="relu"))
     model.add(layers.Dense(n_classes, activation='softmax'))
 
-    model._name=f'resnet_{format(int(false_labels_ratio*100),"06d")}r_{n_classes}c'
+    model._name=f'resnet_{format(int(false_labels_ratio*10000),"05d")}r_{n_classes}c'
 
     return model

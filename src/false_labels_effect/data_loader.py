@@ -18,7 +18,7 @@ class DataLoader(tf.keras.utils.Sequence):
         self.y_true_dict = {}
         self.on_epoch_end()
 
-    def on_epoch_begin(self):
+    def on_epoch_begin(self, epoch, logs=None):
         self.y_true_dict = {}
 
     def on_epoch_end(self):

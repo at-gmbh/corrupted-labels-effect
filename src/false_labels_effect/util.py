@@ -89,6 +89,10 @@ def encode_labels(train_labels_dict: dict, test_labels_dict:dict):
     y = list(train_labels_dict.values()) + list(test_labels_dict.values())
     le.fit(y)
 
+    # get encoding mapping
+    class_name_mapping = dict(zip(le.transform(le.classes_), le.classes_))
+    encoded_dicts.append(class_name_mapping)
+
     # transform labels
     for labels_dict in [train_labels_dict, test_labels_dict]:
         new_dict = {}
@@ -231,7 +235,7 @@ def make_false_labels(label_path, labels, fals_label_ratios, classes):
     ratio_ids_dict = {}
 
     for ratio in fals_label_ratios:
-        label_name = f'Train_{format(int(ratio*10000),"06d")}r.npy'
+        label_name = f'Train_{format(int(ratio*10000),"05d")}r.npy'
 
         # for first (lowest) ratio, create false ratios
         if len(ratio_ids_dict.keys()) == 0:
@@ -344,7 +348,7 @@ def load_false_labels(label_path, false_labels_ratio):
     false_labels : np.array
         array of train labels including falsified labels
     """
-    label_name = f'Train_{format(int(false_labels_ratio*10000),"06d")}r.npy'
+    label_name = f'Train_{format(int(false_labels_ratio*10000),"05d")}r.npy'
     false_labels = np.load(f'{label_path}\{label_name}',
                             allow_pickle=True).item()
     n_labels = len(false_labels)
