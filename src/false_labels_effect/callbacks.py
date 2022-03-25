@@ -37,7 +37,7 @@ class class_report_cb(Callback):
         class_report = classification_report(y_true, y_pred, zero_division=0, output_dict=True)
 
         # initialize logging
-        logdir_class_report = f'../logs/class_report/{self.model._name}/{self.model_start_time}'
+        logdir_class_report = f'./logs/class_report/{self.model._name}/{self.model_start_time}'
 
         os.makedirs(logdir_class_report)
         with open(logdir_class_report + f'/class_report_{epoch}epoch.json', 'w+') as f:

@@ -353,7 +353,7 @@ def load_false_labels(label_path, false_labels_ratio):
                             allow_pickle=True).item()
     n_labels = len(false_labels)
     false_labels_count = math.floor(n_labels * false_labels_ratio)
-    print("Number of false labels:", false_labels_count)
+    print("\nNumber of false labels:", false_labels_count)
 
     return false_labels
 

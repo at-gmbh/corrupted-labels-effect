@@ -38,7 +38,7 @@ class DataLoader(tf.keras.utils.Sequence):
             # Check if train or test
             path_part = 'Train' if 'train' in ID.lower() else 'Test'
             # Store sample
-            X[i,] = np.load('../data/Images_4c_Poly/' + path_part +  '_npy/' + ID + '.npy')
+            X[i,] = np.load('./data/Images_4c_Poly/' + path_part +  '_npy/' + ID + '.npy')
 
             # Store class
             y[i] = self.labels[ID]
