@@ -3,15 +3,15 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - h5py=2.*
-  - ipykernel=6.* 
-  - numpy=1.*
-  - matplotlib=3.*
-  - opencv=4.*
-  - pillow=8.*
-  - pip=21.*
-  - PyYAML=5.*
-  - python=3.8.*
-  - scikit-learn=1.*
-  - tensorflow=2.*
-  - tqdm=4.*
+  - h5py
+  - ipykernel
+  - matplotlib
+  - numpy
+  - opencv
+  - pillow
+  - pip
+  - PyYAML
+  - python
+  - scikit-learn
+  - tensorflow>=2.5
+  - tqdm
