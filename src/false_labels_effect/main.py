@@ -5,6 +5,7 @@ import numpy as np
 import os
 from pathlib import Path
 import sys
+import time
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.callbacks import TensorBoard
 
@@ -12,13 +13,9 @@ from tensorflow.keras.callbacks import TensorBoard
 import tensorflow as tf
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
-# add src to sys.path and import local modules
-# module_path = os.path.abspath(os.path.join('..'))
-# if module_path not in sys.path:
-#     sys.path.append(module_path)
-
 import callbacks as cbs 
 import data_loader as dl
+import gpu_config
 import models as mdls
 import util
 
@@ -39,7 +36,7 @@ elif model_task.lower() == 'subclass':
     n_classes = 14
 
 # set number of images
-limit_loaded_images = 300  # use None for "all" images
+limit_loaded_images = None  # use None for "all" images
 
 # set target size of images
 resize_to = (244, 244) 
@@ -50,7 +47,11 @@ false_ratios = [0.05]
 
 # define data loader parameters
 val_split = 0.2
-batch_size = 32
+batch_size = 8
+
+# definte gpus to use for training by index in tf.config.list_physical_devices('GPU')
+# leave empty to use CPU
+gpus_by_index = [0, 1, 2, 3]
 
 # define model processing parameter
 n_epochs = 2
@@ -129,7 +130,7 @@ if not os.path.exists(f'{test_img_npy_path}'):
 
 #------------------------------------------------------------------------------#
 
-print('Filter images...')
+print('Filtering images...')
 # create dict of included train and test images, format for keras data loader
 partition = {}
 train_img_ids_included = [str(i.name).split(".")[0] for i in train_img_npy_path.iterdir()]
@@ -141,7 +142,7 @@ partition['test'] = [id for id in test_img_ids_included if 'Test' in id]
 
 #------------------------------------------------------------------------------#
 
-print('Filter labels...')
+print('Filtering labels...')
 # filter train labels to only include transformed images
 train_labels_dict_incl = {}
 for (key, value) in train_labels_dict.items():
@@ -160,7 +161,9 @@ test_labels_dict_flat = util.select_label(test_labels_dict_incl, model_task)
 
 # encode categorical labels for classification tasks
 if model_task in ['Class', 'Subclass']:
-    label_mapping, y_train, y_test, = util.encode_labels(train_labels_dict_flat, test_labels_dict_flat)
+    label_mapping, y_train, y_test, = util.encode_labels(
+                                            train_labels_dict_flat,
+                                            test_labels_dict_flat)
     
     label_mapping = {int(k):str(v) for k, v in label_mapping.items()}
     print('    Labels:')
@@ -169,19 +172,30 @@ if model_task in ['Class', 'Subclass']:
 
 #------------------------------------------------------------------------------#
 
-print('Partition labels...')
+print('Partitioning labels...')
 # split training data into train and validation
-partition['train'], y_train, partition['val'], y_val = util.train_val_split(partition['train'], y_train, val_split)
-print('    # train imgs:', len(partition['train']), '- # val imgs:', len(partition['val']), '- # test imgs:', len(partition['test']))
+partition['train'], y_train, partition['val'], y_val = \
+    util.train_val_split(partition['train'], y_train, val_split)
+print('    # train imgs:', len(partition['train']), '- # val imgs:', \
+      len(partition['val']), '- # test imgs:', len(partition['test']))
 
 #------------------------------------------------------------------------------#
 
-print('Create false labels...')
+print('Creating false labels...')
 # create false train labels for all given ratios
 util.make_false_labels(train_label_path, y_train, false_ratios, n_classes)
 
 #------------------------------------------------------------------------------#
 
+print('Setting up GPUs...')
+gpu_config.set_visible_gpus(gpus_by_index)
+
+mirrored_strat = tf.distribute.MirroredStrategy(devices=[f'GPU:{i}' for i in gpus_by_index])
+print(f'    Number of GPUs in use: {mirrored_strat.num_replicas_in_sync}')
+
+#------------------------------------------------------------------------------#
+
+print('Starting training...')
 for ratio in false_ratios:
     # load false train labels
     y_train = util.load_false_labels(train_label_path, ratio)
@@ -199,20 +213,23 @@ for ratio in false_ratios:
     test_loader = dl.DataLoader(partition['test'], y_test, **params)
 
     # load models
-    basic_cnn = mdls.create_cnn_model(resize_to, n_classes, ratio)
-    resnet_cnn = mdls.create_resnet_model(resize_to, n_classes, ratio)
-    all_models = [basic_cnn, resnet_cnn] # TODO: set models to be included
+    with mirrored_strat.scope():
+        # basic_cnn = mdls.create_cnn_model(resize_to, n_classes, ratio)
+        resnet_cnn = mdls.create_resnet_model(resize_to, n_classes, ratio)
+    all_models = [resnet_cnn] # TODO: set models to be included
 
     for model in all_models:
         print(model.summary())
 
         model_start_time = datetime.now().strftime("%Y%m%d-%H%M")
+        start = time.time()
 
         # initialize logging
-        logdir_scalars = f'../logs/scalars/{model._name}/{model_start_time}'
-        logdir_label_mapper = f'../logs/label_mapping/{model._name}/{model_start_time}'
+        logdir_scalars = f'./logs/scalars/{model._name}/{model_start_time}'
+        logdir_label_mapper = f'./logs/label_mapping/{model._name}/{model_start_time}'
         
-        os.makedirs(logdir_label_mapper)
+        if not os.path.exists(logdir_label_mapper):
+            os.makedirs(logdir_label_mapper)
         with open(logdir_label_mapper + '/label_mapper.json', 'w+') as f:
             json.dump(label_mapping, f)
 
@@ -247,6 +264,9 @@ for ratio in false_ratios:
               f'\n{"=" * 65}\n')
 
         model.save(f'../logs/models/{model._name}/{model_start_time}')
+
+        end = time.time()
+        print(f'Time elapsed: {end - start}')
 
 #------------------------------------------------------------------------------#
 
