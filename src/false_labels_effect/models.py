@@ -13,6 +13,8 @@ def create_cnn_model(img_shape, n_classes, false_labels_ratio):
         shape of image
     n_classes : int
         number of classes
+    false_labels_ratio : float
+        ratio of labels that are falsified
 
     Returns
     -------
@@ -23,12 +25,12 @@ def create_cnn_model(img_shape, n_classes, false_labels_ratio):
 
     model.add(layers.Conv2D(244, (3, 3), activation='relu', input_shape=(img_shape[0], img_shape[1], 3)))
     model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(488, (3, 3), activation='relu', input_shape=(img_shape[0], img_shape[1], 3)))
+    model.add(layers.Conv2D(488, (3, 3), activation='relu'))
     model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(978, (3, 3), activation='relu', input_shape=(img_shape[0], img_shape[1], 3)))
+    model.add(layers.Conv2D(978, (3, 3), activation='relu'))
 
     model.add(layers.Flatten())
-    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(16, activation='relu'))
     model.add(layers.Dense(n_classes, activation='softmax'))
 
     model._name=f'basic_{format(int(false_labels_ratio*10000),"05d")}r_{n_classes}c'
@@ -46,6 +48,8 @@ def create_resnet_model(img_shape, n_classes, false_labels_ratio):
         shape of image
     n_classes : int
         number of classes
+    false_labels_ratio : float
+        ratio of labels that are falsified
 
     Returns
     -------
