@@ -39,7 +39,8 @@ class class_report_cb(Callback):
         # initialize logging
         logdir_class_report = f'./logs/class_report/{self.model._name}/{self.model_start_time}'
 
-        os.makedirs(logdir_class_report)
+        if not os.path.exists(logdir_class_report):
+            os.makedirs(logdir_class_report)
         with open(logdir_class_report + f'/class_report_{epoch}epoch.json', 'w+') as f:
             json.dump(class_report, f)
 
