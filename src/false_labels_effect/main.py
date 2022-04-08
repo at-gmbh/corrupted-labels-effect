@@ -36,7 +36,7 @@ elif model_task.lower() == 'subclass':
     n_classes = 14
 
 # set number of images
-limit_loaded_images = None  # use None for "all" images
+limit_loaded_images = 300  # use None for "all" images
 
 # set target size of images
 resize_to = (244, 244) 
@@ -51,10 +51,10 @@ batch_size = 8
 
 # definte gpus to use for training by index in tf.config.list_physical_devices('GPU')
 # leave empty to use CPU
-gpus_by_index = [0, 1, 2, 3]
+gpus_by_index = [0, 1]
 
 # define model processing parameter
-n_epochs = 2
+n_epochs = 3
 multiprocessing = False
 n_workers = 1
 
@@ -237,6 +237,7 @@ for ratio in false_ratios:
         classReport_callback = cbs.class_report_cb(test_loader, model_start_time)
 
         file_writer = tf.summary.create_file_writer(logdir_scalars)
+        file_writer.set_as_default()
 
         # compile model
         model.compile(loss="categorical_crossentropy",
