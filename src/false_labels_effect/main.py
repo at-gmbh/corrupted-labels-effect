@@ -36,14 +36,14 @@ elif model_task.lower() == 'subclass':
     n_classes = 14
 
 # set number of images
-limit_loaded_images = 300  # use None for "all" images
+limit_loaded_images = None  # use None for "all" images
 
 # set target size of images
 resize_to = (244, 244) 
 
 # set list of ratio of false labels in training data between 0 and 1 (low to high)
 # 0.05 => 5% of images in training data will be labeled incorrectly
-false_ratios = [0.05]
+false_ratios = [0.0]
 
 # define data loader parameters
 val_split = 0.2
@@ -51,7 +51,7 @@ batch_size = 8
 
 # definte gpus to use for training by index in tf.config.list_physical_devices('GPU')
 # leave empty to use CPU
-gpus_by_index = [0, 1]
+gpus_by_index = [1, 2]
 
 # define model processing parameter
 n_epochs = 3
@@ -214,9 +214,9 @@ for ratio in false_ratios:
 
     # load models
     with mirrored_strat.scope():
-        # basic_cnn = mdls.create_cnn_model(resize_to, n_classes, ratio)
+        basic_cnn = mdls.create_cnn_model(resize_to, n_classes, ratio)
         resnet_cnn = mdls.create_resnet_model(resize_to, n_classes, ratio)
-    all_models = [resnet_cnn] # TODO: set models to be included
+    all_models = [basic_cnn, resnet_cnn] # TODO: set models to be included
 
     for model in all_models:
         print(model.summary())
@@ -267,7 +267,7 @@ for ratio in false_ratios:
         model.save(f'../logs/models/{model._name}/{model_start_time}')
 
         end = time.time()
-        print(f'Time elapsed: {end - start}')
+        print(f'Time elapsed: {(end - start) / 60}')
 
 #------------------------------------------------------------------------------#
 
