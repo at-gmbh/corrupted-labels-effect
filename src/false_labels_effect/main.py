@@ -1,10 +1,10 @@
 # imports
+from contextlib import redirect_stdout
 from datetime import datetime
 import json
 import numpy as np
 import os
 from pathlib import Path
-import sys
 import time
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.callbacks import TensorBoard
@@ -47,14 +47,14 @@ false_ratios = [0.0]
 
 # define data loader parameters
 val_split = 0.2
-batch_size = 8
+batch_size = 32
 
 # definte gpus to use for training by index in tf.config.list_physical_devices('GPU')
 # leave empty to use CPU
-gpus_by_index = [1, 2]
+gpus_by_index = [2, 3]
 
 # define model processing parameter
-n_epochs = 3
+n_epochs = 15
 multiprocessing = False
 n_workers = 1
 
@@ -216,7 +216,7 @@ for ratio in false_ratios:
     with mirrored_strat.scope():
         basic_cnn = mdls.create_cnn_model(resize_to, n_classes, ratio)
         resnet_cnn = mdls.create_resnet_model(resize_to, n_classes, ratio)
-    all_models = [basic_cnn, resnet_cnn] # TODO: set models to be included
+    all_models = [resnet_cnn] # TODO: set models to be included
 
     for model in all_models:
         print(model.summary())
@@ -227,16 +227,23 @@ for ratio in false_ratios:
         # initialize logging
         logdir_scalars = f'./logs/scalars/{model._name}/{model_start_time}'
         logdir_label_mapper = f'./logs/label_mapping/{model._name}/{model_start_time}'
+        logdir_model_summary = f'./logs/model_summary/{model._name}/{model_start_time}'
         
         if not os.path.exists(logdir_label_mapper):
             os.makedirs(logdir_label_mapper)
         with open(logdir_label_mapper + '/label_mapper.json', 'w+') as f:
             json.dump(label_mapping, f)
 
+        if not os.path.exists(logdir_model_summary):
+            os.makedirs(logdir_model_summary)
+        with open(logdir_model_summary + '/model_summary.txt', 'w+') as f:
+            with redirect_stdout(f):
+                model.summary()
+
         tensorboard_callback = TensorBoard(log_dir=logdir_scalars)
         classReport_callback = cbs.class_report_cb(test_loader, model_start_time)
 
-        file_writer = tf.summary.create_file_writer(logdir_scalars)
+        file_writer = tf.summary.create_file_writer(logdir_scalars + '/test')
         file_writer.set_as_default()
 
         # compile model
@@ -264,7 +271,7 @@ for ratio in false_ratios:
         print(model._name, '- Test accuracy:', score[1],
               f'\n{"=" * 65}\n')
 
-        model.save(f'../logs/models/{model._name}/{model_start_time}')
+        model.save(f'./logs/models/{model._name}/{model_start_time}')
 
         end = time.time()
         print(f'Time elapsed: {(end - start) / 60}')
