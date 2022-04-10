@@ -21,22 +21,78 @@ def create_cnn_model(img_shape, n_classes, false_labels_ratio):
     model : keras.Sequential
         cnn resnet model
     """
+    activation_func = None
+    kernel_tupel = (3, 3)
+    pool_size = (2, 2)
+    leaky_alpha = 0.3
+    dropout_ratio_conv = 0.1
+
     model = models.Sequential()
 
-    model.add(layers.Conv2D(244, (3, 3), activation='relu', input_shape=(img_shape[0], img_shape[1], 3)))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(488, (3, 3), activation='relu'))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(978, (3, 3), activation='relu'))
+    model.add(layers.Conv2D(32,
+                            kernel_tupel,
+                            activation=activation_func,
+                            input_shape=(img_shape[0], img_shape[1], 3)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU(alpha=leaky_alpha))
+    model.add(layers.Dropout(dropout_ratio_conv))
+    model.add(layers.MaxPooling2D(pool_size))
+
+    model.add(layers.Conv2D(64,
+                            kernel_tupel,
+                            activation=activation_func,
+                            input_shape=(img_shape[0], img_shape[1], 3)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU(alpha=leaky_alpha))
+    model.add(layers.Dropout(dropout_ratio_conv))
+    model.add(layers.MaxPooling2D(pool_size))
+
+    model.add(layers.Conv2D(128,
+                            kernel_tupel,
+                            activation=activation_func,
+                            input_shape=(img_shape[0], img_shape[1], 3)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU(alpha=leaky_alpha))
+    model.add(layers.Dropout(dropout_ratio_conv))
+    model.add(layers.MaxPooling2D(pool_size))
+
+    model.add(layers.Conv2D(256,
+                            kernel_tupel,
+                            activation=activation_func,
+                            input_shape=(img_shape[0], img_shape[1], 3)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU(alpha=leaky_alpha))
+    model.add(layers.Dropout(dropout_ratio_conv))
+    model.add(layers.MaxPooling2D(pool_size))
+
+    model.add(layers.Conv2D(256,
+                            kernel_tupel,
+                            activation=activation_func,
+                            input_shape=(img_shape[0], img_shape[1], 3)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU(alpha=leaky_alpha))
+    model.add(layers.Dropout(dropout_ratio_conv))
+    model.add(layers.MaxPooling2D(pool_size))
+
+    model.add(layers.Conv2D(512,
+                            kernel_tupel,
+                            activation=activation_func,
+                            input_shape=(img_shape[0], img_shape[1], 3)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU(alpha=leaky_alpha))
+    model.add(layers.Dropout(dropout_ratio_conv))
+    model.add(layers.MaxPooling2D(pool_size))
 
     model.add(layers.Flatten())
-    model.add(layers.Dense(16, activation='relu'))
+
+    model.add(layers.Dense(1024))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU(alpha=leaky_alpha))
     model.add(layers.Dense(n_classes, activation='softmax'))
 
     model._name=f'basic_{format(int(false_labels_ratio*10000),"05d")}r_{n_classes}c'
 
     return model
-
 
 def create_resnet_model(img_shape, n_classes, false_labels_ratio):
     """
