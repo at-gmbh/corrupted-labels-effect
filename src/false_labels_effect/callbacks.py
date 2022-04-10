@@ -45,16 +45,17 @@ class class_report_cb(Callback):
             json.dump(class_report, f)
 
         for i in range(self.dataloader.n_classes):
-            tf.summary.scalar(f'precision_label_{i}', data=class_report[f'{i}']['precision'], step=epoch)
-            tf.summary.scalar(f'recall_label_{i}', data=class_report[f'{i}']['recall'], step=epoch)
-            tf.summary.scalar(f'f1-score_label_{i}', data=class_report[f'{i}']['f1-score'], step=epoch)
-        
-        tf.summary.scalar(f'precision_model_macro', data=class_report['macro avg']['precision'], step=epoch)
-        tf.summary.scalar(f'recall_model_macro', data=class_report['macro avg']['recall'], step=epoch)
-        tf.summary.scalar(f'f1-score_model_macro', data=class_report['macro avg']['f1-score'], step=epoch)
+            tf.summary.scalar(f'epoch_precision_label_{i}', data=class_report[f'{i}']['precision'], step=epoch)
+            tf.summary.scalar(f'epoch_recall_label_{i}', data=class_report[f'{i}']['recall'], step=epoch)
+            tf.summary.scalar(f'epoch_f1-score_label_{i}', data=class_report[f'{i}']['f1-score'], step=epoch)
 
-        tf.summary.scalar(f'precision_model_weighted', data=class_report['weighted avg']['precision'], step=epoch)
-        tf.summary.scalar(f'recall_model_weighted', data=class_report['weighted avg']['recall'], step=epoch)
-        tf.summary.scalar(f'f1-score_model_weighted', data=class_report['weighted avg']['f1-score'], step=epoch)
+        tf.summary.scalar(f'epoch_accuracy', data=class_report['accuracy'], step=epoch)
+        tf.summary.scalar(f'epoch_precision_macro', data=class_report['macro avg']['precision'], step=epoch)
+        tf.summary.scalar(f'epoch_recall_macro', data=class_report['macro avg']['recall'], step=epoch)
+        tf.summary.scalar(f'epoch_f1-score_macro', data=class_report['macro avg']['f1-score'], step=epoch)
+
+        tf.summary.scalar(f'epoch_precision_weighted', data=class_report['weighted avg']['precision'], step=epoch)
+        tf.summary.scalar(f'epoch_recall_weighted', data=class_report['weighted avg']['recall'], step=epoch)
+        tf.summary.scalar(f'epoch_f1-score_weighted', data=class_report['weighted avg']['f1-score'], step=epoch)
 
         return class_report
