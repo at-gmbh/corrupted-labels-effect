@@ -49,12 +49,12 @@ false_ratios = [0.0]
 val_split = 0.2
 batch_size = 32
 
-# definte gpus to use for training by index in tf.config.list_physical_devices('GPU')
+# define gpus to use by index in tf.config.list_physical_devices('GPU')
 # leave empty to use CPU
-gpus_by_index = [2, 3]
+gpus_by_index = [3]
 
 # define model processing parameter
-n_epochs = 15
+n_epochs = 5
 multiprocessing = False
 n_workers = 1
 
@@ -160,15 +160,12 @@ train_labels_dict_flat = util.select_label(train_labels_dict_incl, model_task)
 test_labels_dict_flat = util.select_label(test_labels_dict_incl, model_task)
 
 # encode categorical labels for classification tasks
-if model_task in ['Class', 'Subclass']:
+if model_task.lower() in ['class', 'subclass']:
     label_mapping, y_train, y_test, = util.encode_labels(
                                             train_labels_dict_flat,
                                             test_labels_dict_flat)
     
     label_mapping = {int(k):str(v) for k, v in label_mapping.items()}
-    print('    Labels:')
-    for k, v in label_mapping.items():
-        print(f'        {k}: {v}')
 
 #------------------------------------------------------------------------------#
 

@@ -31,7 +31,6 @@ def load_labels(npy_path):
     return reformat_labels(labels_dict)
 
 
-
 def select_label(labels_dict: dict, task: str):
     """
     Select labels for model task and flatten dict
@@ -55,9 +54,9 @@ def select_label(labels_dict: dict, task: str):
     """
     new_dict = dict()
     for image_id, list_of_dicts in labels_dict.items():
-        if task in ['Class', 'Annotation']:
+        if task.lower() in ['class', 'annotation']:
             new_dict[image_id] = list_of_dicts[task]
-        elif task == 'Subclass':
+        elif task.lower() == 'subclass':
             new_dict[image_id] = f'{list_of_dicts["Class"]} - {list_of_dicts["Subclass"]}'
         else:
             print("Selected model task does not exist")
