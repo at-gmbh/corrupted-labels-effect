@@ -2,7 +2,7 @@ import json
 import os
 
 import tensorflow as tf
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 from tensorflow.keras.callbacks import Callback
 
 
@@ -34,7 +34,11 @@ class class_report_cb(Callback):
         
         y_true = list(self.dataloader.y_true_dict.values())
 
-        class_report = classification_report(y_true, y_pred, zero_division=0, output_dict=True)
+        class_report = classification_report(y_true,
+                                             y_pred,
+                                             zero_division=0,
+                                             output_dict=True)
+        class_report['confusion_matrix'] = confusion_matrix(y_true, y_pred).tolist()
 
         # initialize logging
         logdir_class_report = f'./logs/class_report/{self.model._name}/{self.model_start_time}'
@@ -45,17 +49,38 @@ class class_report_cb(Callback):
             json.dump(class_report, f)
 
         for i in range(self.dataloader.n_classes):
-            tf.summary.scalar(f'epoch_precision_label_{i}', data=class_report[f'{i}']['precision'], step=epoch)
-            tf.summary.scalar(f'epoch_recall_label_{i}', data=class_report[f'{i}']['recall'], step=epoch)
-            tf.summary.scalar(f'epoch_f1-score_label_{i}', data=class_report[f'{i}']['f1-score'], step=epoch)
+            tf.summary.scalar(f'epoch_precision_label_{i}',
+                                data=class_report[f'{i}']['precision'],
+                                step=epoch)
+            tf.summary.scalar(f'epoch_recall_label_{i}',
+                                data=class_report[f'{i}']['recall'],
+                                step=epoch)
+            tf.summary.scalar(f'epoch_f1-score_label_{i}',
+                                data=class_report[f'{i}']['f1-score'],
+                                step=epoch)
 
-        tf.summary.scalar(f'epoch_accuracy', data=class_report['accuracy'], step=epoch)
-        tf.summary.scalar(f'epoch_precision_macro', data=class_report['macro avg']['precision'], step=epoch)
-        tf.summary.scalar(f'epoch_recall_macro', data=class_report['macro avg']['recall'], step=epoch)
-        tf.summary.scalar(f'epoch_f1-score_macro', data=class_report['macro avg']['f1-score'], step=epoch)
+        tf.summary.scalar(f'epoch_accuracy',
+                            data=class_report['accuracy'],
+                            step=epoch)
 
-        tf.summary.scalar(f'epoch_precision_weighted', data=class_report['weighted avg']['precision'], step=epoch)
-        tf.summary.scalar(f'epoch_recall_weighted', data=class_report['weighted avg']['recall'], step=epoch)
-        tf.summary.scalar(f'epoch_f1-score_weighted', data=class_report['weighted avg']['f1-score'], step=epoch)
+        tf.summary.scalar(f'epoch_precision_macro',
+                            data=class_report['macro avg']['precision'],
+                            step=epoch)
+        tf.summary.scalar(f'epoch_recall_macro',
+                            data=class_report['macro avg']['recall'],
+                            step=epoch)
+        tf.summary.scalar(f'epoch_f1-score_macro',
+                            data=class_report['macro avg']['f1-score'],
+                            step=epoch)
+
+        tf.summary.scalar(f'epoch_precision_weighted',
+                            data=class_report['weighted avg']['precision'],
+                            step=epoch)
+        tf.summary.scalar(f'epoch_recall_weighted',
+                            data=class_report['weighted avg']['recall'],
+                            step=epoch)
+        tf.summary.scalar(f'epoch_f1-score_weighted',
+                            data=class_report['weighted avg']['f1-score'],
+                            step=epoch)
 
         return class_report
