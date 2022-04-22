@@ -60,6 +60,7 @@ logs/scalars/
 logs/class_report/
 logs/label_mapping/
 logs/model_summary/
+tensorboard_upload/
 
 # models
 logs/models/
