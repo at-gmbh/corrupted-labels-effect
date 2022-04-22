@@ -56,6 +56,8 @@ target/
 .ipynb_checkpoints
 
 # logs
+logs/*.csv
+logs/*.pkl
 logs/scalars/
 logs/class_report/
 logs/label_mapping/
