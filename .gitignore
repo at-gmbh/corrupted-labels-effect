@@ -64,6 +64,9 @@ logs/label_mapping/
 logs/model_summary/
 tensorboard_upload/
 
+# assets
+assets/
+
 # models
 logs/models/
 
