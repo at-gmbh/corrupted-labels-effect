@@ -56,7 +56,8 @@ target/
 .ipynb_checkpoints
 
 # logs
-logs/scalars/
+logs/
+!logs/example_classification_report.json
 
 # models
 logs/models/
