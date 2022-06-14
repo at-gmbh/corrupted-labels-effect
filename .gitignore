@@ -68,7 +68,6 @@ tensorboard_upload/
 
 # assets
 assets/
-!assets/.gitkeep
 
 # models
 logs/models/
