@@ -56,13 +56,7 @@ target/
 .ipynb_checkpoints
 
 # logs
-logs/*.csv
-logs/*.pkl
-logs/scalars/
-logs/class_report/
-logs/label_mapping/
-logs/model_summary/
-logs/result_log/
+logs/
 tensorboard_upload/
 !logs/example_classification_report.json
 
