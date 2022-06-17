@@ -27,7 +27,7 @@ filter = 'class_report_19epoch.json'
 #     aggr_class_report_log_path
 # )
 
-# load aggregated class reports
+# load classification results table
 df = util.load_aggr_class_reports(aggr_class_report_log_path)
 
 #------------------------------------------------------------------------------#
@@ -106,20 +106,22 @@ for column in X_df.columns:
 regr_results['properties']['pearsonr'] = r
 regr_results['properties']['p_value'] = p
 
-# split data
+# split data - random state to reproduce split in initial model selection
 test_split = 0.2
 if use_grouping:
     X_train, X_test, y_train, y_test = train_test_split(
-                                                    X_df
-                                                    , y_df
-                                                    , test_size=test_split
-                                                )
+                                                X_df
+                                                , y_df
+                                                , test_size=test_split
+                                                , random_state=71
+                                            )
 else:
     X_train, X_test, y_train, y_test = train_test_split(
                                                 X_df
                                                 , y_df
                                                 , test_size=test_split
-                                                , stratify=y_df
+                                                , random_state=71
+                                                # , stratify=y_df
                                             )
 
 # scale X data
@@ -160,7 +162,7 @@ row = [[
     regr_results['properties']['model'],
     regr_results['properties']['classification_task'],
     regr_results['properties']['n'],
-    ', '.join(regr_results['properties']['group_by']),
+    regr_results['properties']['group_by'],
     regr_results['properties']['delta'],
     regr_results['properties']['zscore_threshold'],
     regr_results['properties']['pearsonr'],
@@ -183,11 +185,11 @@ df_temp = pd.DataFrame(
     ]
 )
 
-# add results to regression results dataframe
+# add results to regression results dataframe and save as csv
 result_file = regr_results_log_path + "regr_results.csv"
 if os.path.exists(result_file):
     df_results = pd.read_csv(result_file)
-    df_results = df_results.append(df_temp, ignore_index=True)
+    df_results = pd.concat([df_results, df_temp])
     df_results.to_csv(result_file, index=False)
 else:
     df_temp.to_csv(result_file, index=False)
