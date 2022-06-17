@@ -107,7 +107,7 @@ regr_results['properties']['pearsonr'] = r
 regr_results['properties']['p_value'] = p
 
 # split data - random state to reproduce split in initial model selection
-test_split = 0.2
+test_split = 0.2 if len(df_regression) > 100 else 0.1
 if use_grouping:
     X_train, X_test, y_train, y_test = train_test_split(
                                                 X_df
