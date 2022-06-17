@@ -56,7 +56,8 @@ def hyperparameter_tuning(
             param_grid=params,
             cv=cv,
             scoring='neg_root_mean_squared_error',
-            verbose=0
+            verbose=1,
+            n_jobs=-1
         )
         gs.fit(X_train, y_train)
 
@@ -110,13 +111,13 @@ def train_estimators(regr_results_log, X_train, y_train):
         BayesianRidge(),
         DummyRegressor(),
         ElasticNet(),
-        # GradientBoostingRegressor(),
+        GradientBoostingRegressor(),
         Lasso(),
         LinearRegression(),
-        # RandomForestRegressor(),
-        # Ridge(),
-        # SGDRegressor(),
-        # SVR(),
+        RandomForestRegressor(),
+        Ridge(),
+        SGDRegressor(),
+        SVR(),
     ]
 
     regr_results_log['regr_results'] = {}
@@ -126,7 +127,8 @@ def train_estimators(regr_results_log, X_train, y_train):
             estimator,
             X_train, y_train,
             cv=10,
-            scoring='neg_root_mean_squared_error'
+            scoring='neg_root_mean_squared_error',
+            # verbose=1
         )
 
         # log results
@@ -293,7 +295,7 @@ def regr_results_logger(
         regr_props['properties']['model'] = cnn if cnn else 'all'
         regr_props['properties']['classification_task'] = classes if classes else 'all'
         regr_props['properties']['delta'] = use_delta
-        regr_props['properties']['group_by'] = [k for k, v in group_by.items() if v]
+        regr_props['properties']['group_by'] = group_by
         regr_props['properties']['zscore_threshold'] = zscore_threshold
 
         return regr_props
@@ -414,33 +416,8 @@ def init_estimator(estimator_name):
         Grid search params for estimator
     """
     # initialize estimators and hyperparameter params for grid search
-    if estimator_name == 'DummyRegressor':
-        estimator = DummyRegressor()
-        params = {}
-        params['strategy'] = ['mean', 'median', 'quantile']
-        params['quantile'] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    elif estimator_name == 'LinearRegression':
-        estimator = LinearRegression()
-        params = {}
-    elif estimator_name == 'Lasso':
-        estimator = Lasso()
-        params = {}
-        params['max_iter'] = [10000]
-        params['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0]
-        params['selection'] = ['random', 'cyclic']
-    elif estimator_name == 'ElasicNet':
-        estimator = ElasticNet()
-        params = {}
-        params['max_iter'] = [10000]
-        params['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0]
-        params['l1_ratio'] = np.linspace(0.001, 0.999, 10)
-        params['selection'] = ['random', 'cyclic']
-    elif estimator_name == 'Ridge':
-        estimator = Ridge()
-        params = {}
-        params['max_iter'] = [1000]
-        params['alpha'] = [1e-2, 1e-1, 1.0, 10.0, 100.0]
-    elif estimator_name == 'BayesianRidge':
+    
+    if estimator_name == 'BayesianRidge':
         estimator = BayesianRidge()
         params = {}
         # params['max_iter'] = [10000]
@@ -448,29 +425,21 @@ def init_estimator(estimator_name):
         params['alpha_2'] = [1e-6, 1e-5, 1e-4]
         params['lambda_1'] = [1e-6, 1e-5, 1e-4]
         params['lambda_2'] = [1e-6, 1e-5, 1e-4]
-    elif estimator_name == 'SGDRegressor':
-        estimator = SGDRegressor()
+    
+    elif estimator_name == 'DummyRegressor':
+        estimator = DummyRegressor()
         params = {}
-        params['loss'] = ['squared_error', 'huber', 'epsilon_insensitive']
-        params['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0]
+        params['strategy'] = ['mean', 'median', 'quantile']
+        params['quantile'] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+    elif estimator_name == 'ElasicNet':
+        estimator = ElasticNet()
+        params = {}
         params['max_iter'] = [10000]
-        params['epsilon'] = [1e-2, 1e-1, 1.0]
-        params['learning_rate'] = ['constant', 'optimal', 'invscaling', 'adaptive']
-    elif estimator_name == 'SVR':
-        estimator = SVR()
-        params = {}
-        params['kernel'] = ['linear', 'poly'] # 'rbf', 'sigmoid'
-        params['degree'] = [1, 2, 3]
-        params['gamma'] = [1e-1, 1.0, 10.0]
-        params['coef0'] = [0.0, 0.1, 0.3, 0.8]
-        params['C'] = [1e-1, 1.0, 10.0]
-        # params['epsilon'] = [1e-2, 1e-1, 1.0]
-    elif estimator_name == 'RandomForestRegressor':
-        estimator = RandomForestRegressor()
-        params = {}
-        params['n_estimators'] = [100, 200, 300, 400, 500]
-        params['criterion'] = ['squared_error'] # 'absolute_error', 'poisson'
-        params['max_depth'] = [1, 2, 3, 4, 5]
+        params['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0]
+        params['l1_ratio'] = np.linspace(0.001, 0.999, 10)
+        params['selection'] = ['random', 'cyclic']
+
     elif estimator_name == 'GradientBoostingRegressor':
         estimator = GradientBoostingRegressor()
         params = {}
@@ -480,5 +449,52 @@ def init_estimator(estimator_name):
         # params['criterion'] = ['friedman_mse', 'squared_error', 'absolute_error']
         params['max_depth'] = [1, 2, 4]
         params['alpha'] = [0.1, 0.5, 0.9]
+
+    elif estimator_name == 'Lasso':
+        estimator = Lasso()
+        params = {}
+        params['max_iter'] = [10000]
+        params['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0]
+        params['selection'] = ['random', 'cyclic']
+
+    elif estimator_name == 'LinearRegression':
+        estimator = LinearRegression()
+        params = {}
+
+    elif estimator_name == 'RandomForestRegressor':
+        estimator = RandomForestRegressor()
+        params = {}
+        params['n_estimators'] = [100, 200, 300, 400, 500]
+        params['criterion'] = ['squared_error'] # 'absolute_error', 'poisson'
+        params['max_depth'] = [1, 2, 3, 4, 5]
+
+    elif estimator_name == 'Ridge':
+        estimator = Ridge()
+        params = {}
+        params['max_iter'] = [1000]
+        params['alpha'] = [1e-2, 1e-1, 1.0, 10.0, 100.0]
+
+    elif estimator_name == 'SGDRegressor':
+        estimator = SGDRegressor()
+        params = {}
+        params['loss'] = ['squared_error', 'huber', 'epsilon_insensitive']
+        params['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0]
+        params['max_iter'] = [10000]
+        params['epsilon'] = [1e-2, 1e-1, 1.0]
+        params['learning_rate'] = ['constant', 'optimal', 'invscaling', 'adaptive']
+
+    elif estimator_name == 'SVR':
+        estimator = SVR()
+        params = {}
+        params['kernel'] = ['linear', 'poly'] # 'rbf', 'sigmoid'
+        params['degree'] = [2, 3, 4]
+        params['gamma'] = ['scale', 'auto']
+        params['coef0'] = [0.0, 0.1, 0.3, 0.8]
+        params['C'] = [1e-1, 1.0, 10.0]
+        # params['epsilon'] = [1e-2, 1e-1, 1.0]
+
+    else:
+        print('Estimator not found')
+        exit()
 
     return estimator , params
