@@ -126,7 +126,7 @@ def train_estimators(regr_results_log, X_train, y_train):
         cv_results = cross_val_score(
             estimator,
             X_train, y_train,
-            cv=40,
+            cv=20,
             scoring='neg_root_mean_squared_error',
             # verbose=1
         )
@@ -180,7 +180,7 @@ def filter_outliers(
             # drop outliers
             df_regression.dropna(inplace=True)
         
-        print(f'\t{n_filtered} rows filtered')
+        print(f'\t{n_filtered} outliers filtered')
         return df_regression
 
 def filter_data(

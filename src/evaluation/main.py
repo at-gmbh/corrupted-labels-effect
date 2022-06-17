@@ -34,9 +34,10 @@ df = util.load_aggr_class_reports(aggr_class_report_log_path)
 print('Setting regression data properties...')
 # --> TODO: set regression properties below <--
 regressor = 'accuracy'  # regressor to use
-cnn = False             # model to filter for ('resnet', 'basic'), False for all
-classes = False         # classification task to filter for (4 or 14), False for all
-use_delta = False       # use regressor delta to 0 ratio model for regression
+multi_regression = False # TODO: implement multi-regression
+cnn = 'basic' # model to filter for ('resnet', 'basic'), False for all
+classes = 14 # classification task to filter for (4 or 14), False for all
+use_delta = False # use regressor delta to 0 ratio model for regression
 
 group_by = {
     'model': False,
@@ -100,7 +101,7 @@ y_df = df_regression['ratio']
 # calculate correlation (pearsonr and p-values)
 for column in X_df.columns:
     r, p = stats.pearsonr(X_df[column], y_df)
-    print(f'\t{round(r, 4)} pearsonr, {p} p-value, Variable: {column}')
+    print(f'\t{round(r, 4)} pearsonr, {round(p, 10)} p-value, Variable: {column}')
 
 # log correlation
 regr_results['properties']['pearsonr'] = r
@@ -108,20 +109,22 @@ regr_results['properties']['p_value'] = p
 
 # split data - random state to reproduce split in initial model selection
 test_split = 0.2 if len(df_regression) > 100 else 0.1
-if use_grouping:
+# stratify only if test data can include all 10 ratios
+if len(df_regression) * test_split > 9:
     X_train, X_test, y_train, y_test = train_test_split(
                                                 X_df
                                                 , y_df
                                                 , test_size=test_split
                                                 , random_state=71
+                                                , stratify=y_df
                                             )
+    print('\tStratified train/test split')
 else:
     X_train, X_test, y_train, y_test = train_test_split(
                                                 X_df
                                                 , y_df
                                                 , test_size=test_split
                                                 , random_state=71
-                                                # , stratify=y_df
                                             )
 
 # scale X data
@@ -144,7 +147,7 @@ for k, v in regr_results['regr_results'].items():
     if v['neg_rmse'] > best_score:
         best_score = v['neg_rmse']
         best_estimator = k
-print(f'\t-> Best estimator: {best_estimator}')
+print(f'\t--> Best estimator: {best_estimator} <--')
 
 #------------------------------------------------------------------------------#
 print('Searching for best hyperparameters...')
