@@ -108,19 +108,21 @@ def train_estimators(regr_results_log, X_train, y_train):
     """
     # initialize estimators
     estimators = [
-        BayesianRidge(),
-        DummyRegressor(),
-        ElasticNet(),
-        GradientBoostingRegressor(),
-        Lasso(),
-        LinearRegression(),
-        RandomForestRegressor(),
-        Ridge(),
-        SGDRegressor(),
-        SVR(),
+        DummyRegressor()
+        , BayesianRidge()
+        , ElasticNet()
+        , GradientBoostingRegressor()
+        , Lasso()
+        , LinearRegression()
+        , RandomForestRegressor()
+        , Ridge()
+        , SGDRegressor()
+        , SVR()
     ]
 
+    print('\t<mean neg rmse> (<std neg rmse>) : <estimator>')
     regr_results_log['regr_results'] = {}
+
     # iterate through estimators
     for estimator in estimators:
         cv_results = cross_val_score(
