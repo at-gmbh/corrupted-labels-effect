@@ -1,5 +1,6 @@
 # imports
 import os
+import random
 import warnings
 
 import matplotlib.pyplot as plt
@@ -33,20 +34,24 @@ df = util.load_aggr_class_reports(aggr_class_report_log_path)
 #------------------------------------------------------------------------------#
 print('Setting regression data properties...')
 # --> TODO: set regression properties below <--
-regressor = 'accuracy'  # regressor to use
+regressor = 'accuracy' # regressor to use
 multi_regression = False # TODO: implement multi-regression
-cnn = 'basic' # model to filter for ('resnet', 'basic'), False for all
+cnn = 'resnet' # model to filter for ('resnet', 'basic'), False for all
 classes = 14 # classification task to filter for (4 or 14), False for all
-use_delta = False # use regressor delta to 0 ratio model for regression
+use_delta = True # use regressor delta to 0 ratio model for regression
 
 group_by = {
     'model': False,
     'classes': False,
     'ratio': False
-}                       # vars to group data by
-zscore_threshold = False    # threshold for removing outlier, False for no filtering
+} # vars to group data by
+zscore_threshold = False # threshold for removing outlier, False for no filtering
 
 use_grouping = any(group_by.values())
+
+# check properties
+if cnn not in ['resnet', 'basic', False] or classes not in [4, 14, False]:
+    raise ValueError('Invalid model or classes filter')
 
 #------------------------------------------------------------------------------#
 print('Initializing logging...')
@@ -83,7 +88,9 @@ sns.pairplot(
     df_regression[[regressor, f'{regressor}_delta', 'ratio']],
     diag_kind='kde'
 ).fig.savefig('./assets/regr_pairplot.png')
+
 plt.clf()
+
 sns.boxplot(
     x='ratio', y=regressor, data=df_regression
 ).get_figure().savefig('./assets/regr_boxplot.png')
@@ -94,6 +101,7 @@ print('Setting up training...')
 # get independent and dependent variables
 if use_delta:
     X_df = df_regression[[f'{regressor}_delta']]
+    print(f'\tUsing {regressor} delta')
 else:
     X_df = df_regression[[regressor]]
 y_df = df_regression['ratio']
@@ -107,15 +115,20 @@ for column in X_df.columns:
 regr_results['properties']['pearsonr'] = r
 regr_results['properties']['p_value'] = p
 
+# log random state for train/test split reproducibility
+random_state = random.randint(0, 1000)
+regr_results['properties']['split_random_state'] = random_state
+
 # split data - random state to reproduce split in initial model selection
 test_split = 0.2 if len(df_regression) > 100 else 0.1
+
 # stratify only if test data can include all 10 ratios
 if len(df_regression) * test_split > 9:
     X_train, X_test, y_train, y_test = train_test_split(
                                                 X_df
                                                 , y_df
                                                 , test_size=test_split
-                                                , random_state=71
+                                                , random_state=random_state
                                                 , stratify=y_df
                                             )
     print('\tStratified train/test split')
@@ -124,7 +137,7 @@ else:
                                                 X_df
                                                 , y_df
                                                 , test_size=test_split
-                                                , random_state=71
+                                                , random_state=random_state
                                             )
 
 # scale X data
@@ -165,6 +178,7 @@ row = [[
     regr_results['properties']['model'],
     regr_results['properties']['classification_task'],
     regr_results['properties']['n'],
+    regr_results['properties']['split_random_state'],
     regr_results['properties']['group_by'],
     regr_results['properties']['delta'],
     regr_results['properties']['zscore_threshold'],
@@ -181,10 +195,10 @@ row = [[
 df_temp = pd.DataFrame(
     data = row,
     columns = [
-        'regressor', 'regressand', 'model', 'classification_task', 'n',
-        'group_by', 'delta', 'zscore_threshold', 'pearsonr', 'p_value',
-        'estimator', 'neg_rmse_train', 'neg_rmse_test', 'r2_train',
-        'r2_test', 'best_params'
+        'regressor', 'regressand', 'model', 'classification_task',
+        'n', 'split_random_state', 'group_by', 'delta', 'zscore_threshold',
+        'pearsonr', 'p_value', 'estimator', 'neg_rmse_train', 'neg_rmse_test',
+        'r2_train', 'r2_test', 'best_params'
     ]
 )
 
