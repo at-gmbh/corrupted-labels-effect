@@ -1,4 +1,4 @@
-name: false-labels
+name: false-labels-test
 channels:
   - conda-forge
   - defaults
