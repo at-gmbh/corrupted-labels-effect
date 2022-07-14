@@ -56,18 +56,19 @@ target/
 .ipynb_checkpoints
 
 # logs
-logs/
+logs/*
 tensorboard_upload/
 !logs/example_classification_report.json
 
 # assets
-assets/
+assets/*
+!assets/altered_image_1.png
+!assets/altered_image_2.png
+!assets/altered_image_3.png
+!assets/.gitkeep
 
 # models
 logs/models/
-
-# assets
-assets/
 
 # virtualenv
 .env
