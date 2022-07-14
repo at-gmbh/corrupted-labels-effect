@@ -55,7 +55,7 @@ The modules in `src` are setup as follows:
     - [./src/false_labels_effect/callbacks.py](./src/false_labels_effect/callbacks.py): tensorflow callbacks for the models
     - [./src/false_labels_effect/data_loader.py](./src/false_labels_effect/data_loader.py): keras data loader
     - [./src/false_labels_effect/gpu_config.py](./src/false_labels_effect/gpu_config.py): GPU configuration
-    - ['./src/false_labels_effect/main.py'](./src/false_labels_effect/main.py): **entry point for classification training and testing**
+    - [./src/false_labels_effect/main.py](./src/false_labels_effect/main.py): **entry point for classification training and testing**
     - [./src/false_labels_effect/models.py](./src/false_labels_effect/models.py): model architecutre definition and initialization
     - [./src/false_labels_effect/util.py](./src/false_labels_effect/util.py): utility functions for data and label processing
 - [./src/data_generator/](./src/data_generator/): module to modify images and create labels (100% correctly labeled data)
