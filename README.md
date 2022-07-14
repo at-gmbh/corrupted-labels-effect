@@ -1,6 +1,14 @@
 # False Labels Effect
 
-Measuring the effect of false labels within training data on model performance.
+**Measuring the effect of false labels within training data on model performance.**
+
+**In this work, we focus on studying the impairment of image classification on model performance due to false labels in the training dataset. We artificially generate alterations on images with the help of computer vision algorithms - and consequently label them 100% correctly without discrepancies. We then introduce and steadily increase the ratio of falsified labels and measure the effect of the false label ratio on model performance. Thereby, we hope to draw and generalize conclusion of said effect for potential inference as well as find models or model architectures that are as robust as possible to data sets with incorrect annotations.**
+
+<br>
+
+------------------------
+
+<br>
 
 Two different classification tasks (4 & 14 classes) are performed using computer vision deep learning models.
 Modifications to the images and respective labels are generated artificially, resulting in 100% correct data labels.
