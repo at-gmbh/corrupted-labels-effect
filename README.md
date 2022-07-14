@@ -2,17 +2,23 @@
 
 Measuring the effect of false labels within training data on model performance.
 
-Two different classification tasks (4 & 14 classes) are performed using computer vision deep learning models. Modifications to the images and respective labels are generated artificially, resulting in 100% correct data labels. As a baseline, the model is trained and tested on the 100% correctly labeled data.
+Two different classification tasks (4 & 14 classes) are performed using computer vision deep learning models.
+Modifications to the images and respective labels are generated artificially, resulting in 100% correct data labels.
+As a baseline, the model is trained and tested on the 100% correctly labeled data.
 
-[]()
+<img src="assets\altered_image_1.png" alt="altered image" width="400"/>
 
-[]()
+<img src="assets\altered_image_2.png" alt="altered image" width="400"/>
 
-[]()
+<img src="assets\altered_image_3.png" alt="altered image" width="400"/>
 
-###### examples of altered images
+~Examples of altered images, each left to right: original image, original image with drawn in region of change, original image with drawn-in region including changed pixel values - and changed image with which the neural networks were trained~
 
-Then, some labels are updated (falsified) iteratively per training run (e.g. 0.5%, 1%, 2%, etc.) to match a desired false label rate in the training data. The model is then trained on the modified data including falsified labels, and tested using correctly labeled data. Resulting metrics are examined comparing the model performance on the modified data with each other and to the model performance on the 100% correctly labeled data using regression.
+<br>
+
+Then, some labels are updated (falsified) iteratively per training run (e.g. 0.5%, 1%, 2%, etc.) to match a desired false label rate in the training data. 
+The model is then trained on the modified data including falsified labels, and tested using correctly labeled data.
+Resulting metrics are examined comparing the model performance on the modified data with each other and to the model performance on the 100% correctly labeled data using regression.
 
 <br>
 
