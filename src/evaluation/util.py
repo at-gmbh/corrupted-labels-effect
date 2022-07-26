@@ -14,6 +14,8 @@ from sklearn.linear_model import (BayesianRidge, ElasticNet, Lasso,
                                   LinearRegression, Ridge, SGDRegressor)
 from sklearn.metrics import r2_score
 from sklearn.model_selection import GridSearchCV, cross_val_score
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.svm import SVR
 
 
@@ -460,8 +462,8 @@ def init_estimator(estimator_name):
         params['selection'] = ['random', 'cyclic']
 
     elif estimator_name == 'LinearRegression':
-        estimator = LinearRegression()
-        params = {}
+        estimator = make_pipeline(PolynomialFeatures(),LinearRegression())
+        params = {'polynomialfeatures__degree': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
 
     elif estimator_name == 'RandomForestRegressor':
         estimator = RandomForestRegressor()

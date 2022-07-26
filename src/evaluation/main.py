@@ -36,9 +36,9 @@ print('Setting regression data properties...')
 # --> TODO: set regression properties below <--
 regressor = 'accuracy' # regressor to use
 multi_regression = False # TODO: implement multi-regression
-cnn = 'resnet' # model to filter for ('resnet', 'basic'), False for all
-classes = 14 # classification task to filter for (4 or 14), False for all
-use_delta = True # use regressor delta to 0 ratio model for regression
+cnn = 'basic' # model to filter for ('resnet', 'basic'), False for all
+classes = 4 # classification task to filter for (4 or 14), False for all
+use_delta = False # use regressor delta to 0 ratio model for regression
 
 group_by = {
     'model': False,
@@ -210,3 +210,5 @@ if os.path.exists(result_file):
     df_results.to_csv(result_file, index=False)
 else:
     df_temp.to_csv(result_file, index=False)
+    
+print('\tResults saved to ' + result_file)
