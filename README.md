@@ -195,10 +195,6 @@ Before contributing, please set up the pre-commit hooks to reduce errors and ens
 
 <br>
 
-## Contact
-
-Daniel Czwalinna (daniel.czwalinna@alexanderthamm.com)
-
 ## License
 
 © Alexander Thamm GmbH
