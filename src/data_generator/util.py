@@ -11,11 +11,7 @@ import yaml
 from matplotlib.patches import Circle
 from PIL import Image
 
-"""
-Created on Sat Aug 29 11:16:03 2020
 
-@author: Wolfgang Reuter
-"""
 def load_image(path, resize=None):
     """
     Load an image from a file location directly into numpy.

@@ -11,17 +11,49 @@ from scipy import stats
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+"""
+
+This script loads classification results and trains various regression
+estimators to evaluate effect of corrupted (false) labels on classification
+model performance.
+
+Various data properties can be set to define level of aggregation and filter
+classification results before regression. This includes:
+    - regressor:            Classification metric to run regression against
+                            corrupted labels ratio
+    - filter:               Filter classification results by classification
+                            report files, e.g., to only use classification 
+                            report from epoch 19 of classification model training
+    - multi-regression:     Run multiple regression - Note: currently not available
+    - cnn:                  Classification model results to include in regression
+    - classes:              Classification task results to include in regression
+    - use_delta:            Whether to use delta values for regression, i.e.,
+                            difference between classification performance metric
+                            and performance metric of same classification setup
+                            but with 0 corrupted labels ratio
+    - group_by:             Group classification results by classification setup
+                            properties
+    - zscore_threshold:     Threshold for z-score to filter classification results
+
+TODO: update regression data properties and filter
+TODO: review and update paths of classification results and regression logging
+
+"""
+
+# remove deprecation warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #------------------------------------------------------------------------------#
 print('Loading data...')
-# define path and file filter
-regr_results_log_path = './logs/regr_results/'
+# define path and classification report file filter
+regr_results_log_path = './logs/regr_results/' # where to log regression results
 class_report_log_path = './logs/class_report'
+explore_vis_log_path = './assets/'
 aggr_class_report_log_path = './data/'
 filter = 'class_report_19epoch.json'
 
 # aggregate class reports
+# TODO: uncomment on first run to aggregate classification reports
 # util.aggr_class_reports(
 #     class_report_log_path,
 #     filter,
@@ -44,7 +76,7 @@ group_by = {
     'model': False,
     'classes': False,
     'ratio': False
-} # vars to group data by
+} # classification setup to group data by
 zscore_threshold = False # threshold for removing outlier, False for no filtering
 
 use_grouping = any(group_by.values())
@@ -74,7 +106,7 @@ df_regression = util.filter_data(
     use_grouping, group_by, df_regression, cnn, classes
 )
 
-# filter outliers if properties are set
+# filter outliers if property is set
 df_regression = util.filter_outliers(
     df_regression, regressor, use_grouping, zscore_threshold
 )
@@ -87,13 +119,13 @@ regr_results['properties']['n'] = df_regression.shape[0]
 sns.pairplot(
     df_regression[[regressor, f'{regressor}_delta', 'ratio']],
     diag_kind='kde'
-).fig.savefig('./assets/regr_pairplot.png')
+).fig.savefig(explore_vis_log_path + 'regr_pairplot.png')
 
 plt.clf()
 
 sns.boxplot(
     x='ratio', y=regressor, data=df_regression
-).get_figure().savefig('./assets/regr_boxplot.png')
+).get_figure().savefig(explore_vis_log_path + 'regr_boxplot.png')
 print('\tPlots saved to ./assets/')
 
 #------------------------------------------------------------------------------#
@@ -152,6 +184,7 @@ print(
 
 #------------------------------------------------------------------------------#
 print('Training estimators...')
+# train regression estimators - see util.py for estimators
 regr_results = util.train_estimators(regr_results, X_train, y_train)
 
 # get estimator with best score
@@ -171,7 +204,7 @@ regr_results = util.hyperparameter_tuning(
 
 #------------------------------------------------------------------------------#
 print('Logging regression results...')
-
+# setup regression logger properties
 row = [[
     regr_results['properties']['regressor'],
     regr_results['properties']['regressand'],
@@ -192,6 +225,7 @@ row = [[
     regr_results['best_estimator']['best_params'],
 ]]
 
+# create result df
 df_temp = pd.DataFrame(
     data = row,
     columns = [

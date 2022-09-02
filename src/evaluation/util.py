@@ -306,8 +306,7 @@ def regr_results_logger(
 
 def load_aggr_class_reports(aggr_classReport_path):
     """
-    Aggregate classification reports from multiple model training runs filtered
-    for a specific epoch. Saves the aggregated report to a csv file.
+    Load aggregate classification reports from csv file.
 
     Parameters
     ----------

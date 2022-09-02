@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Aug 31 14:00:31 2020
-
-@author: Wolfgang Reuter
-
 This script sets up the altered images and respective labels for the project.
 
 There are four main alteration classes:
@@ -31,10 +27,12 @@ i.e. Train_00011,
 
 and a list of dictionaries as value, i.e.
 
-[{'Img_id': 'Train_00011'},
- {'Class': 'Blob'},
- {'Subclass': 'Green'},
- {'Annotations': [[38, 64], [328, 117], [242, 273], [119, 238], [38, 64]]}]
+[
+    {'Img_id': 'Train_00011'},
+    {'Class': 'Blob'},
+    {'Subclass': 'Green'},
+    {'Annotations': [[38, 64], [328, 117], [242, 273], [119, 238], [38, 64]]}
+]
 
 The labels dictionaries are stored in .npy format in the specified folders.
 

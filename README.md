@@ -1,8 +1,10 @@
-# False Labels Effect
+# Corrupted Labels Effect
 
-**Measuring the effect of false labels within training data on model performance.**
+**Measuring the effect of corrupted labels within training data on model performance.**
 
-**In this work, we focus on studying the impairment of image classification on model performance due to false labels in the training dataset. We artificially generate alterations on images with the help of computer vision algorithms - and consequently label them 100% correctly without discrepancies. We then introduce and steadily increase the ratio of falsified labels and measure the effect of the false label ratio on model performance. Thereby, we hope to draw and generalize conclusion of said effect for potential inference as well as find models or model architectures that are as robust as possible to data sets with incorrect annotations.**
+**In this work, we focus on studying the impairment of image classification on model performance due to corrupted labels in the training dataset. We artificially generate alterations on images with the help of computer vision algorithms - and consequently label them 100% correctly without discrepancies. We then introduce and steadily increase the ratio of falsified labels and measure the effect of the corrupted label ratio on model performance. Thereby, we hope to draw and generalize conclusion of said effect for potential inference as well as find models or model architectures that are as robust as possible to data sets with incorrect annotations.**
+
+Note: "corrupted labels" and "false labels" are used interchangeably in this work.
 
 <br>
 
@@ -14,7 +16,7 @@ Two different classification tasks (4 & 14 classes) are performed using computer
 Modifications to the images and respective labels are generated artificially, resulting in 100% correct data labels.
 As a baseline, the model is trained and tested on the 100% correctly labeled data.
 
-Then, some labels are updated (falsified) iteratively per training run (e.g. 0.5%, 1%, 2%, etc.) to match a desired false label rate in the training data. 
+Then, some labels are updated (corrupted) iteratively per training run (e.g. 0.5%, 1%, 2%, etc.) to match a desired corrupted label rate in the training data. 
 The model is then trained on the modified data including falsified labels, and tested using correctly labeled data.
 Resulting metrics are examined comparing the model performance on the modified data with each other and to the model performance on the 100% correctly labeled data using regression.
 
@@ -95,11 +97,10 @@ The modules in `src` are setup as follows:
     - [./src/false_labels_effect/util.py](./src/false_labels_effect/util.py): utility functions for data and label processing
 - [./src/data_generator/](./src/data_generator/): module to modify images and create labels (100% correctly labeled data)
     - [./src/data_generator/generate_data.py](./src/data_generator/generate_data.py): **entry point for generating artificially altering images and respective labels**
-    - ~~[./src/data_generator/main.py](./src/data_generator/main.py):~~ not used
+    - ~~[./src/data_generator/main.py](./src/data_generator/main.py):~~ currently not used
     - [./src/data_generator/util.py](./src/data_generator/util.py): utility functions for artificial image altering and label generation
 - [./src/evaluation/](./src/evaluation/): module to train and test regression on classification results
     - [./src/evaluation/main.py](./src/evaluation/main.py): **entry point for regression training and testing**
-    - [./src/evaluation/tensorboard_load.py](./src/evaluation/tensorboard_load.py): load metrics from a specified live tensorboard
     - [./src/evaluation/util.py](./src/evaluation/util.py): utility function for data and label processing as well as model training
 
 <br>
@@ -123,6 +124,18 @@ To activate the environment run:
 To update this environment with your production dependencies run:
 
     conda env update --file=environment.yml
+
+**Project flow:**
+
+1. download data and alter based on [./src/data_generator/generate_data.py](./src/data_generator/generate_data.py)
+2. train and test classification models based on [./src/false_labels_effect/main.py](./src/false_labels_effect/main.py)
+3. train and test classification result regression estimator based on [./src/evaluation/main.py](./src/evaluation/main.py)
+
+Optionally, you can (review required to meet specific requirements):
+
+- explore the classification data and labels based on [./notebooks/exploratory.ipynb](./notebooks/exploratory.ipynb)
+- visualize classification results based on [./notebooks/result_visualization.ipynb](./notebooks/result_visualization.ipynb)
+- visualize regression results based on [./notebooks/result_regression.ipynb](./notebooks/result_regression.ipynb)
 
 <br>
 
